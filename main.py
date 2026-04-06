@@ -16,7 +16,7 @@ class QuestionRequest(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Course Insight Engine API"}
+    return {"message": "Welcome to Smart Lecture Repository"}
 
 @app.post("/upload")
 def upload_lecture(lecture: LectureCreate):
