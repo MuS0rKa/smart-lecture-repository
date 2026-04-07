@@ -48,7 +48,7 @@ if st.sidebar.button("Process and Save"):
                 
                 if extracted_text:
                     payload = {"title": new_title, "content": extracted_text}
-                    res = requests.post(f"{BASE_URL}/upload", json=payload)
+                    res = requests.post(f"{BASE_URL}/ask", json=payload, timeout=180)
                     if res.status_code == 200:
                         st.success(f"Saved! Extracted {len(extracted_text)} characters.")
                         st.rerun()
