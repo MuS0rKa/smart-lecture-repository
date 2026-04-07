@@ -9,8 +9,8 @@ app = FastAPI()
 
 database.init_db()
 
-OPENROUTER_API_KEY = "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"
-OPENROUTER_MODEL = "qwen/qwen-2.5-72b-instruct"
+OPENROUTER_API_KEY = "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"
+OPENROUTER_MODEL = "qwen/qwen3.6-plus:free"
 
 class LectureCreate(BaseModel):
     title: str

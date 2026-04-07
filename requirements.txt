@@ -2,7 +2,7 @@ fastapi
 uvicorn
 streamlit
 requests
-openai
+pydantic
 PyPDF2
 python-docx
 python-pptx
