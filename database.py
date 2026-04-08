@@ -7,19 +7,21 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
     
-    # Таблица для хранения учебных материалов
+    # Добавили user_id для привязки лекции к человеку
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS lectures (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
             title TEXT NOT NULL,
             content TEXT NOT NULL
         )
     ''')
     
-    # Таблица для хранения истории вопросов и ответов
+    # Добавили user_id для привязки истории
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
             lecture_id INTEGER,
             question TEXT NOT NULL,
             answer TEXT NOT NULL,
@@ -31,47 +33,43 @@ def init_db():
     conn.commit()
     conn.close()
 
-def add_lecture(title, content):
+def add_lecture(user_id, title, content):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO lectures (title, content) VALUES (?, ?)", (title, content))
+    cursor.execute("INSERT INTO lectures (user_id, title, content) VALUES (?, ?, ?)", (user_id, title, content))
     conn.commit()
     conn.close()
 
-def get_lectures():
+def get_lectures(user_id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, title FROM lectures")
+    cursor.execute("SELECT id, title FROM lectures WHERE user_id = ?", (user_id,))
     lectures = cursor.fetchall()
     conn.close()
     return lectures
 
-def save_interaction(lecture_id, question, answer):
+def save_interaction(user_id, lecture_id, question, answer):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO history (lecture_id, question, answer) VALUES (?, ?, ?)",
-        (lecture_id, question, answer)
+        "INSERT INTO history (user_id, lecture_id, question, answer) VALUES (?, ?, ?, ?)",
+        (user_id, lecture_id, question, answer)
     )
     conn.commit()
     conn.close()
 
-def get_history(lecture_id):
+def get_history(user_id, lecture_id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT question, answer FROM history WHERE lecture_id = ?", (lecture_id,))
+    cursor.execute("SELECT question, answer FROM history WHERE user_id = ? AND lecture_id = ?", (user_id, lecture_id))
     history = cursor.fetchall()
     conn.close()
     return history
 
-def get_lecture_content(lecture_id):
+def get_lecture_content(user_id, lecture_id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT content FROM lectures WHERE id = ?", (lecture_id,))
+    cursor.execute("SELECT content FROM lectures WHERE user_id = ? AND id = ?", (user_id, lecture_id))
     result = cursor.fetchone()
     conn.close()
     return result[0] if result else None
-
-if __name__ == "__main__":
-    init_db()
-    print("База данных успешно инициализирована!")
