@@ -1,7 +1,6 @@
 from PyPDF2 import PdfReader
 from docx import Document
 from pptx import Presentation
-import io
 
 def extract_text(file):
     file_extension = file.name.split('.')[-1].lower()

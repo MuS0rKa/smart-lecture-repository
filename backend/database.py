@@ -1,13 +1,15 @@
 import sqlite3
+import os
 
 def get_connection():
-    return sqlite3.connect("study_buddy.db")
+    if not os.path.exists("data"):
+        os.makedirs("data")
+    return sqlite3.connect("data/study_buddy.db")
 
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
     
-    # Добавили user_id для привязки лекции к человеку
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS lectures (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,7 +19,6 @@ def init_db():
         )
     ''')
     
-    # Добавили user_id для привязки истории
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

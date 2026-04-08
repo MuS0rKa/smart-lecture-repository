@@ -1,11 +1,11 @@
 import streamlit as st
 import requests
 import utils
+import os
 
 st.set_page_config(page_title="Smart Lecture Repository", layout="wide")
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
 
-# --- LOGIN LOGIC ---
 if "user_id" not in st.session_state:
     st.session_state.user_id = ""
 
@@ -18,20 +18,16 @@ if not st.session_state.user_id:
             st.rerun()
         else:
             st.warning("Please enter a name")
-    st.stop() # Останавливаем выполнение, пока нет ника
+    st.stop()
 
-# --- MAIN APP ---
-# --- MAIN APP ---
 user_id = st.session_state.user_id
 st.title(f"Smart lecture repository - Hi, {user_id}!")
 
-# Sidebar
 st.sidebar.header(f"User: {user_id}")
 if st.sidebar.button("Log out"):
     st.session_state.user_id = ""
     st.rerun()
 
-# 1. Сначала загружаем лекции
 try:
     response = requests.get(f"{BASE_URL}/lectures/{user_id}")
     if response.status_code == 200:
@@ -42,7 +38,6 @@ except Exception as e:
     st.sidebar.error(f"Backend error: {e}")
     lectures = []
 
-# 2. Отрисовка выбора лекций (Sidebar)
 st.sidebar.subheader("Your Lectures")
 lecture_titles = {l['id']: l['title'] for l in lectures}
 
@@ -57,7 +52,6 @@ else:
     st.sidebar.info("No lectures yet. Upload one below! 👇")
     selected_lecture_id = None
 
-# 3. Форма загрузки (всегда видна в Sidebar)
 st.sidebar.divider()
 st.sidebar.subheader("Add new lecture")
 new_title = st.sidebar.text_input("Lecture title")
@@ -77,23 +71,19 @@ if st.sidebar.button("Process and Save"):
                     else:
                         st.error("Failed to save.")
 
-# 4. ЧАТ (Центральная часть)
 st.divider()
 
 if selected_lecture_id:
     st.subheader(f"💬 Chatting about: {lecture_titles[selected_lecture_id]}")
     
-    # Инициализация сообщений для конкретной лекции
     if "messages" not in st.session_state or st.session_state.get("last_lecture_id") != selected_lecture_id:
         st.session_state.messages = []
         st.session_state.last_lecture_id = selected_lecture_id
 
-    # Отображение чата
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # Ввод вопроса
     if user_question := st.chat_input("Ask a question about this lecture..."):
         st.session_state.messages.append({"role": "user", "content": user_question})
         with st.chat_message("user"):
@@ -114,5 +104,4 @@ if selected_lecture_id:
                 else:
                     st.error(f"API Error: {res.text}")
 else:
-    # Если лекция не выбрана, показываем красивую заглушку вместо пустоты
     st.info("👈 Please upload your first lecture in the sidebar to start chatting with AI.")

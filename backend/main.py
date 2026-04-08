@@ -5,7 +5,6 @@ import os
 import database
 import requests
 import json
-import time
 
 load_dotenv()
 app = FastAPI()
@@ -59,7 +58,7 @@ def ask_question(req: QuestionRequest):
             timeout=120
         )
         answer = response.json()['choices'][0]['message']['content']
-        # Сохраняем в историю с привязкой к юзеру
+        
         database.save_interaction(req.user_id, req.lecture_id, req.question, answer)
         return {"answer": answer}
     except Exception as e:

@@ -1,8 +1,5 @@
-fastapi
-uvicorn
 streamlit
 requests
-pydantic
 PyPDF2
 python-docx
 python-pptx
